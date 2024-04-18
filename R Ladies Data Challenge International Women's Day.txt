@@ -1,0 +1,13 @@
+Readme: 
+
+This is my first R dashboard. I have had experience using R for other things. However, I took on this new challenge to build a dashboard this weekend based on "flexdashboard". After the challenge, I hope to develop it further in the future.
+
+The following links were used and from Statistics Canada - 
+
+Statistics Canada. Table 14-10-0416-03  Proportion of women and men employed in management positions, annual. https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410041603&cubeTimeFrame.startYear=2000&cubeTimeFrame.endYear=2023&referencePeriods=20000101%2C20230101
+
+Statistics Canada. Table 33-10-0791-01  Average percentage of women and men in management positions, first quarter of 2024. https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3310079101 
+
+Statistics Canada. Table 33-10-0660-01  Average percentage of women and men in management positions, first quarter of 2023. https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3310066001
+
+Statistics Canada. Table 33-10-0491-01  Average percentage of women and men in management positions, first quarter of 2022. https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3310049101

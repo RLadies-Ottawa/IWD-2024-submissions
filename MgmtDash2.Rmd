@@ -1,0 +1,175 @@
+---
+title: "Investing in Women: Management" 
+output: flexdashboard::flex_dashboard
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r global, include=FALSE}
+#N.Asare, n.asare@hotmail.com - Data Sources used came from Statistics Canada
+#Importing libraries 
+library(flexdashboard)
+library(tidyverse) 
+library(highcharter) 
+library(gt) 
+library(htmltools)
+library(viridis) 
+library("readxl")
+library(plotly)
+
+
+ #Importing data 
+dfannual<-read_excel("C:/Users/nasar/OneDrive/WomenMgmtData/MgmtData.xlsx",sheet = "DataForDB2")
+
+df<-read_excel("C:/Users/nasar/OneDrive/WomenMgmtData/AvgPctMgmt2123.xlsx",sheet = "AveragePctMgmtData")
+
+dfnaics<-read_excel("C:/Users/nasar/OneDrive/WomenMgmtData/AvgPctMgmt2123.xlsx",sheet = "DataNAICS")
+
+dfage<-read_excel("C:/Users/nasar/OneDrive/WomenMgmtData/AvgPctMgmt2123.xlsx",sheet = "BusinessAge")
+
+dftype<-read_excel("C:/Users/nasar/OneDrive/WomenMgmtData/AvgPctMgmt2123.xlsx",sheet = "BusinessType")
+
+dfsize<-read_excel("C:/Users/nasar/OneDrive/WomenMgmtData/AvgPctMgmt2123.xlsx",sheet = "BusinessSize")
+
+
+dfowner<-read_excel("C:/Users/nasar/OneDrive/WomenMgmtData/AvgPctMgmt2123.xlsx",sheet = "Ownership")
+```
+
+# Industry
+
+## Column {.tabset .tabset-fade data-width="650"}
+
+### Trends in Women Management
+
+```{r facet}
+prs <- c("Canada", "British Columbia", "Alberta", "Saskatchewan", "Manitoba","Ontario",
+   "Quebec", "New Brunswick", "Nova Scotia", "Prince Edward Island", "Newfoundland and Labrador")
+
+#ggplot()+
+#  geom_line(data = dfannual, mapping = aes(x=REF_DATE, y= VALUE, colour = factor(GEO)))
+
+plot_line <-dfannual %>%
+  filter(.,Sex == "Females", GEO == "Canada") %>% 
+  ggplot(aes(x = REF_DATE, y= VALUE, colour = NOC)) +
+  geom_line(linewidth = 1)+
+  labs(title = "Proportion of women managers employed in Canada", x="",y = "Percent", colour = "") +
+    theme(plot.title = element_text(size = 12), axis.text=element_text(size=11), legend.text = element_text(size=7))
+
+  
+ggplotly(plot_line)
+```
+
+## Column {data-width="350"}
+
+### Women in management position for all industries
+
+```{r}
+bar_plot <- dfnaics %>% 
+  select(REF_DATE, GEO, NAICS, AvgPctEmp, VALUE) %>% 
+  filter(NAICS %in% c("All industries"), AvgPctEmp %in% c("Women in all other positions", "Women in senior management positions","Women in all other management positions" )) %>% 
+  mutate(REF_DATE = as.factor(REF_DATE) ) %>% 
+  group_by(REF_DATE, AvgPctEmp) %>% 
+  ggplot(aes(x = factor(AvgPctEmp, level=c("Women in all other positions","Women in all other management positions", "Women in senior management positions")) , y = VALUE, fill = REF_DATE)) +
+   labs(title = "Proportion of women employed in all industries in Canada", x="",y = "Percent", fill = "") +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(plot.title = element_text(size = 12), axis.text=element_text(size=12),legend.text = element_text(size=9), legend.position = "bottom") +  
+ scale_x_discrete(labels = c('Other','Other management','Senior management')) 
+
+bar_plot + coord_flip()
+```
+
+### Women employed as managers by industry
+
+```{r}
+bar_plot2 <- dfnaics %>% 
+  select(REF_DATE, GEO, NAICS, AvgPctEmp, VALUE) %>% 
+  filter(AvgPctEmp %in% c("Women in senior management positions","Women in all other management positions" ), REF_DATE == 2023) %>% 
+  #mutate(REF_DATE = as.factor(REF_DATE) ) %>% 
+ # group_by(AvgPctEmp, NAICS) %>% 
+  ggplot(aes(x = factor(NAICS, level=c('All industries', 'Agriculture, forestry, fishing and hunting', 'Mining, quarrying, and oil and gas extraction','Construction', 'Manufacturing','Wholesale trade', 'Retail trade','Transportation and warehousing','Information and cultural industries', 'Finance and insurance','Real estate and rental and leasing', 'Professional, scientific and technical services', 'Health care and social assistance', 'Arts, entertainment and recreation', 'Accommodation and food services', 'Other services (except public administration)')), y = VALUE, fill = AvgPctEmp)) +
+   labs(title = "Proportion of women managers emp. in 2023", x="",y = "Percent", fill = "") +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(plot.title = element_text(size = 10), axis.text=element_text(size=10),legend.text = element_text(size=9), legend.position = "bottom") +  
+  scale_x_discrete(limits = rev)+
+  scale_fill_discrete(labels = c('Other','Senior'), guide = guide_legend(reverse = TRUE))
+
+bar_plot2 + coord_flip()
+```
+
+# Ownership {data-orientation="rows"}
+
+## Row {data-height="500"}
+
+### Business Age
+
+```{r}
+bar_plot3 <- dfage %>% 
+  select(REF_DATE, GEO, Age, AvgPctEmp, VALUE) %>% 
+  filter(GEO %in% c("Canada"), AvgPctEmp %in% c("Women in all other positions", "Women in senior management positions","Women in all other management positions" )) %>% 
+  mutate(Age = as.factor(Age) ) %>% 
+  group_by(Age, AvgPctEmp) %>% 
+  ggplot(aes(x = factor(Age, level=c("All ages", "2 years or less", "3 to 10 years old", "11 to 20 years old","More than 20 years old" )) , y = VALUE, fill = AvgPctEmp)) +
+   labs(title = "Proportion of women employed by business age", x="",y = "Percent", fill = "") +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(plot.title = element_text(size = 13), axis.text=element_text(size=10),legend.text = element_text(size=8), legend.position = "bottom") +
+  scale_x_discrete(limits = rev)+
+  scale_fill_discrete(labels = c('Other Management','All other positions','Senior Management'), guide = guide_legend(reverse = TRUE))
+
+bar_plot3 + coord_flip()
+```
+
+### Business Type
+
+```{r}
+bar_plot4 <- dftype %>% 
+  select(REF_DATE, GEO, BusinessType, AvgPctEmp, VALUE) %>% 
+  filter(GEO %in% c("Canada"), AvgPctEmp %in% c("Women in all other positions", "Women in senior management positions","Women in all other management positions" )) %>% 
+  mutate(BusinessType = as.factor(BusinessType) ) %>% 
+  group_by(BusinessType, AvgPctEmp) %>% 
+  ggplot(aes(x = factor(BusinessType, level=c("NPOs serving businesses","NPO serving HH or Ind", "Non-profit organizations", "Private sector businesses", "Government agencies", "All")) , y = VALUE, fill = AvgPctEmp)) +
+   labs(title = "Proportion of women employed by business type", x="",y = "Percent", fill = "") +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(plot.title = element_text(size = 12), legend.text = element_text(size=8), legend.position = "bottom") +
+  scale_fill_discrete(labels = c('Other Management','All other positions','Senior Management'), guide = guide_legend(reverse = TRUE))
+
+bar_plot4 + coord_flip()
+```
+
+## Row {data-height="500"}
+
+### Business Size
+
+```{r}
+bar_plot5 <- dfsize %>% 
+  select(REF_DATE, GEO, BusinessSize, AvgPctEmp, VALUE) %>% 
+  filter(GEO %in% c("Canada"), AvgPctEmp %in% c("Women in all other positions", "Women in senior management positions","Women in all other management positions" )) %>% 
+  mutate(BusinessSize = as.factor(BusinessSize) ) %>% 
+  group_by(BusinessSize, AvgPctEmp) %>% 
+  ggplot(aes(x = factor(BusinessSize, level=c("All sizes","1 to 4 employees", "5 to 19 employees", "20 to 99 employees", "100 or more employees")) , y = VALUE, fill = AvgPctEmp)) +
+   labs(title = "Proportion of women employed by business size", x="",y = "Percent", fill = "") +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(plot.title = element_text(size = 13), legend.text = element_text(size=9), legend.position = "bottom") +
+  scale_x_discrete(limits = rev)+
+  scale_fill_discrete(labels = c('Other Management','All other positions','Senior Management'), guide = guide_legend(reverse = TRUE))
+
+bar_plot5+ coord_flip()
+```
+
+### Majority Ownership
+
+```{r}
+bar_plot6 <- dfowner %>% 
+  select(REF_DATE, GEO, MajorityOwner, AvgPctEmp, VALUE) %>% 
+  filter(GEO %in% c("Canada"), AvgPctEmp %in% c("Women in all other positions", "Women in senior management positions","Women in all other management positions" )) %>% 
+  mutate(MajorityOwner = as.factor(MajorityOwner) ) %>% 
+  group_by(MajorityOwner, AvgPctEmp) %>% 
+  ggplot(aes(x = factor(MajorityOwner, level=c("All ownerships", "Woman", "Indigenous","Visible minority","LGBTQ2", "Disabled", "Immigrants" )) , y = VALUE, fill = AvgPctEmp)) +
+   labs(title = "Proportion of women employed by majority ownership type", x="",y = "Percent", fill = "") +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(plot.title = element_text(size = 13), legend.text = element_text(size=10), legend.position = "bottom") +
+  scale_fill_discrete(labels = c('Other Management','All other positions','Senior Management'))
+
+bar_plot6
+```
+
